@@ -19,6 +19,7 @@ class TasksController < ApplicationController
   def create
   	@task = Task.new(task_params.merge(user_id: current_user.id))
   	if @task.save
+      logger.debug "task: #{@task.attributes.inspect}"
   	  redirect_to @task, notice: "タスク「#{@task.name}」を登録しました。"
     else
       render :new
@@ -36,6 +37,12 @@ class TasksController < ApplicationController
     task.destroy
     redirect_to tasks_url, notice: "タスク「#{task.name}」を削除しました。"
   end
+
+  def task_logger
+    @task_logger ||= Logger.new('log/task.log', 'daly')
+  end
+
+  task_logger.debug 'taskのログを出力'
 
   private
 
