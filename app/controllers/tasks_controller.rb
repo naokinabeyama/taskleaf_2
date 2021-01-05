@@ -1,7 +1,8 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
   def index
-  	@tasks = current_user.tasks.order(created_at: :desc)
+    @q = current_user.tasks.ransack(params[:q])
+  	@tasks = @q.result(distinct: true)
   end
 
   def show
@@ -23,6 +24,12 @@ class TasksController < ApplicationController
 
   def create
   	@task = Task.new(task_params.merge(user_id: current_user.id))
+
+    if params[:back].present?
+      render :new
+      return
+    end
+
   	if @task.save
       logger.debug "task: #{@task.attributes.inspect}"
   	  redirect_to @task, notice: "タスク「#{@task.name}」を登録しました。"
@@ -47,7 +54,7 @@ class TasksController < ApplicationController
     @task_logger ||= Logger.new('log/task.log', 'daly')
   end
 
-  task_logger.debug 'taskのログを出力'
+  # task_logger.debug 'taskのログを出力'
 
   private
 
