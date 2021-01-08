@@ -1,11 +1,4 @@
 class Task < ApplicationRecord
-	def self.ransackable_attributes(auth_object = nil)
-		%w[name created_at]
-	end
-
-	def self.ransackable_associations(auth_object = nil)
-		[]
-	end
 	# コールバック
 	# before_validation :set_nameless_name
 
@@ -13,8 +6,17 @@ class Task < ApplicationRecord
 	validate :validate_name_not_including_conma
 
 	belongs_to :user
+	has_one_attached :image
 
 	scope :recent, -> { order(created_at: :desc) }
+
+	def self.ransackable_attributes(auth_object = nil)
+		%w[name created_at]
+	end
+
+	def self.ransackable_associations(auth_object = nil)
+		[]
+	end
 
 	private
 
